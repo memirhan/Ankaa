@@ -1,4 +1,6 @@
-# Tek Genel sıralama ile haftalık soru sayısı ekle kaldı.
+# Tek Genel sıralama ile haftalık soru sayısı ekle kaldı. küçük nüanslarda yapıldı
+# genel sıralamanın butonları filan yapılcak
+# Haftalık soru sayısı ekle yapıldı incele yapılcak
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 import platform
@@ -7,13 +9,14 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import sqlite3
+from PyQt5.QtWidgets import QMessageBox
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.student_buttons = []
         self.setWindowTitle("Anasayfa")
-        self.showFullScreen()
+        #self.showFullScreen()
         self.setStyleSheet("background-color: #2c2f33; color: white;")
         self.create_database()
 
@@ -40,19 +43,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ogrencilerim_button = QtWidgets.QPushButton("ÖĞRENCİLERİM")
         self.ogrencilerim_button.setStyleSheet(
-            "background-color: #40444b; border-radius: 10px; padding: 10px;"
+            "background-color: #40444B; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: white;"
             "border: 2px solid #7289da;"
         )
         self.main_layout.addWidget(self.ogrencilerim_button)
 
-        
-
         self.ogrencilerim_button.clicked.connect(self.ogrenci_page)
 
         self.haftalık_deneme_sonucu = QtWidgets.QPushButton("DENEMELER")
         self.haftalık_deneme_sonucu.setStyleSheet(
-            "background-color: #00aaff; border-radius: 10px; padding: 10px;"
+            "background-color: #3F51B5; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: white;"
         )
         self.main_layout.addWidget(self.haftalık_deneme_sonucu)
@@ -60,11 +61,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.sorun_bildir = QtWidgets.QPushButton("Sorun Bildir")
         self.sorun_bildir.setStyleSheet(
-            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "background-color: #FF7F00; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: white;"
         )
+
+        #ff4747
         self.main_layout.addWidget(self.sorun_bildir)
         self.sorun_bildir.clicked.connect(self.sorun_bildir_func)
+
+        self.kapat_button = QtWidgets.QPushButton("Uygulamayı Kapat")
+        self.kapat_button.setStyleSheet(
+            "background-color: #FF4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+        )
+
+        #ff4747
+        self.main_layout.addWidget(self.kapat_button)
+        self.kapat_button.clicked.connect(self.kapat)
 
         self.students = []
         self.row = 0
@@ -126,6 +139,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ders_denemesi_gor_table_page = QtWidgets.QWidget()
         self.ders_denemesi_gor_table_layout = QtWidgets.QVBoxLayout(self.ders_denemesi_gor_table_page)
 
+        self.haftalik_soru_ekle_one_page = QtWidgets.QWidget()
+        self.haftalik_soru_ekle_one_layout = QtWidgets.QVBoxLayout(self.haftalik_soru_ekle_one_page)
+
+        self.haftalik_soru_ekle_two_page = QtWidgets.QWidget()
+        self.haftalik_soru_ekle_two_layout = QtWidgets.QVBoxLayout(self.haftalik_soru_ekle_two_page)
+
+        self.haftalik_soru_ekle_dersler_page = QtWidgets.QWidget()
+        self.haftalik_soru_ekle_dersler_layout = QtWidgets.QVBoxLayout(self.haftalik_soru_ekle_dersler_page)
+
+        self.haftalik_soru_incele_one_page = QtWidgets.QWidget()
+        self.haftalik_soru_incele_one_layout = QtWidgets.QVBoxLayout(self.haftalik_soru_incele_one_page)
+
+        self.haftalik_soru_incele_two_page = QtWidgets.QWidget()
+        self.haftalik_soru_incele_two_layout = QtWidgets.QVBoxLayout(self.haftalik_soru_incele_two_page)
+
+        
+
         self.student_name_label = QtWidgets.QLabel("")
         self.student_name_label.setAlignment(QtCore.Qt.AlignCenter)
         self.student_name_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
@@ -137,6 +167,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ders_denemesi_ekle_page.setLayout(self.ders_denemesi_ekle_layout)
         self.ders_denemesi_gor_one_page.setLayout(self.ders_denemesi_gor_one_layout)
         self.ders_denemesi_gor_table_page.setLayout(self.ders_denemesi_gor_table_layout)
+        self.haftalik_soru_ekle_one_page.setLayout(self.haftalik_soru_ekle_one_layout)
+        self.haftalik_soru_ekle_two_page.setLayout(self.haftalik_soru_ekle_two_layout)
+        self.haftalik_soru_ekle_dersler_page.setLayout(self.haftalik_soru_ekle_dersler_layout)
+        self.haftalik_soru_incele_one_page.setLayout(self.haftalik_soru_incele_one_layout)
+        self.haftalik_soru_incele_two_page.setLayout(self.haftalik_soru_incele_two_layout)
 
         # Stacked a ekle
         self.stacked_widget.addWidget(self.ogrencim_page)
@@ -145,8 +180,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stacked_widget.addWidget(self.ders_denemesi_ekle_page)
         self.stacked_widget.addWidget(self.ders_denemesi_gor_one_page)
         self.stacked_widget.addWidget(self.ders_denemesi_gor_table_page)
+        self.stacked_widget.addWidget(self.haftalik_soru_ekle_one_page)
+        self.stacked_widget.addWidget(self.haftalik_soru_ekle_two_page)
+        self.stacked_widget.addWidget(self.haftalik_soru_ekle_dersler_page)
+        self.stacked_widget.addWidget(self.haftalik_soru_incele_one_page)
+        self.stacked_widget.addWidget(self.haftalik_soru_incele_two_page)
+
         
         self.load_students()
+
+    def kapat(self):
+        yanit = QMessageBox.question(
+            self,
+            "Çıkış Onayı",
+            "Uygulamayı kapatmak istediğinizden emin misiniz?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if yanit == QMessageBox.Yes:
+            self.close()
 
     def handle_back_button(self):
         current_page = self.stacked_widget.currentWidget()
@@ -171,6 +224,15 @@ class MainWindow(QtWidgets.QMainWindow):
         elif current_page == self.ders_denemesi_gor_table_page:
             self.stacked_widget.setCurrentWidget(self.ders_denemesi_gor_one_page)
 
+        elif current_page == self.haftalik_soru_ekle_one_page:
+            self.stacked_widget.setCurrentWidget(self.ogrencim_page)
+
+        elif current_page == self.haftalik_soru_ekle_two_page:
+            self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_one_page)
+
+        elif current_page == self.haftalik_soru_ekle_dersler_page:
+            self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_two_page)
+            
         else:
             self.stacked_widget.setCurrentWidget(self.main_page)
 
@@ -372,6 +434,18 @@ class MainWindow(QtWidgets.QMainWindow):
                                 yanlis_sayisi INTEGER,
                                 bos_sayisi INTEGER,
                                 FOREIGN KEY (ogrenci_id) REFERENCES students(id) ON DELETE CASCADE)''')
+        
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS haftalik_soru (
+                                id INTEGER PRIMARY KEY,
+                                ogrenci_id INTEGER,
+                                ders_id INTEGER,
+                                ders_ismi TEXT,
+                                ay TEXT,
+                                hafta TEXT,
+                                dogru_sayisi INTEGER,
+                                yanlis_sayisi INTEGER,
+                                bos_sayisi INTEGER,
+                                FOREIGN KEY (ogrenci_id) REFERENCES students(id) ON DELETE CASCADE)''')
     
                 
         self.conn.commit()
@@ -531,6 +605,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if hasattr(self, 'haftalik_soru_ekle') and self.haftalik_soru_ekle:
             self.haftalik_soru_ekle.deleteLater()
 
+        if hasattr(self, 'haftalik_soru_incele') and self.haftalik_soru_incele:
+            self.haftalik_soru_incele.deleteLater()
+
         if hasattr(self, 'ders_denemesi_button') and self.ders_denemesi_button:
             self.ders_denemesi_button.deleteLater()
 
@@ -582,8 +659,18 @@ class MainWindow(QtWidgets.QMainWindow):
             "background-color: #9B59B6; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: black; color: #ffffff"
             )
-            self.haftalik_soru_ekle.clicked.connect(self.load_students)
+            self.haftalik_soru_ekle.clicked.connect(self.haftalik)
             self.ogrencim_layout.addWidget(self.haftalik_soru_ekle)
+            ###############################
+
+            # HAFTALIK SORU SAYISI GÖR
+            self.haftalik_soru_incele = QtWidgets.QPushButton("Haftalık Soru Sayısını İncele")
+            self.haftalik_soru_incele.setStyleSheet(
+            "background-color: #AF7AC5; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+            self.haftalik_soru_incele.clicked.connect(self.haftalik_incele)
+            self.ogrencim_layout.addWidget(self.haftalik_soru_incele)
             ###############################
 
             # DERS DENEMELERİ
@@ -1334,6 +1421,583 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 # Force table view update
                 self.exam_results_ders_denemesi_gor_table.viewport().update()
+
+    def haftalik(self):
+        if hasattr(self, 'student_name_label_haftalik_soru') and self.student_name_label_haftalik_soru:
+            self.student_name_label_haftalik_soru.deleteLater()
+        
+        if hasattr(self, 'ocak_buton') and self.ocak_buton:
+            self.ocak_buton.deleteLater()
+
+        if hasattr(self, 'subat_buton') and self.subat_buton:
+            self.subat_buton.deleteLater()
+
+        if hasattr(self, 'mart_buton') and self.mart_buton:
+            self.mart_buton.deleteLater()
+
+        if hasattr(self, 'nisan_buton') and self.nisan_buton:
+            self.nisan_buton.deleteLater()
+
+        if hasattr(self, 'mayis_buton') and self.mayis_buton:
+            self.mayis_buton.deleteLater()
+
+        if hasattr(self, 'haziran_buton') and self.haziran_buton:
+            self.haziran_buton.deleteLater()
+
+        if hasattr(self, 'temmuz_buton') and self.temmuz_buton:
+            self.temmuz_buton.deleteLater()
+
+        if hasattr(self, 'agustos_buton') and self.agustos_buton:
+            self.agustos_buton.deleteLater()
+
+        if hasattr(self, 'eylul_buton') and self.eylul_buton:
+            self.eylul_buton.deleteLater()
+
+        if hasattr(self, 'ekim_buton') and self.ekim_buton:
+            self.ekim_buton.deleteLater()
+
+        if hasattr(self, 'kasim_buton') and self.kasim_buton:
+            self.kasim_buton.deleteLater()
+
+        if hasattr(self, 'aralik_buton') and self.aralik_buton:
+            self.aralik_buton.deleteLater()
+
+        if hasattr(self, 'back_button_haftalik_soru_ekle') and self.back_button_haftalik_soru_ekle:
+            self.back_button_haftalik_soru_ekle.deleteLater()
+
+        self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
+        result2 = self.cursor.fetchone()
+        self.isim = result2[0]
+
+        self.cursor.execute("SELECT id FROM students WHERE name = ?", (self.isim,)) # nameem sayesinde id yi alıyour
+        result = self.cursor.fetchone()
+        self.current_student_id = result[0]
+        print(self.current_student_id)
+
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+
+        self.student_name_label_haftalik_soru = QtWidgets.QLabel(f"{ogrenci_ismi} Haftalık Soru Sayısını Ekle")
+        self.student_name_label_haftalik_soru.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_haftalik_soru.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.student_name_label_haftalik_soru)
+        self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_one_page)
+
+        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_two("ocak"), "#5DADE2")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.ocak_buton)
+        
+        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_two("subat"), "#AF7AC5")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.subat_buton)
+        
+        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_two("mart"), "#58D68D")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.mart_buton)
+        
+        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_two("nisan"), "#F4D03F")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.nisan_buton)
+        
+        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_two("mayis"), "#45B39D")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.mayis_buton)
+
+        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_two("haziran"), "#F1948A")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.haziran_buton)
+
+        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_two("temmuz"), "#EC7063")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.temmuz_buton)
+
+        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_two("agustos"), "#F39C12")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.agustos_buton)
+
+        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_two("eylul"), "#DC7633")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.eylul_buton)
+
+        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_two("ekim"), "#D35400")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.ekim_buton)
+
+        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_two("kasim"), "#873600")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.kasim_buton)
+
+        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_two("aralik"), "#7FB3D5")
+        self.haftalik_soru_ekle_one_layout.addWidget(self.aralik_buton)
+
+        self.back_button_haftalik_soru_ekle = QtWidgets.QPushButton("Geri Dön")
+        self.back_button_haftalik_soru_ekle.setStyleSheet(
+            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+            )
+        self.back_button_haftalik_soru_ekle.clicked.connect(self.handle_back_button)
+        self.haftalik_soru_ekle_one_layout.addWidget(self.back_button_haftalik_soru_ekle)
+
+    def haftalik_two(self, ay):
+        if hasattr(self, 'student_name_label_haftalik_soru_two') and self.student_name_label_haftalik_soru_two:
+            self.student_name_label_haftalik_soru_two.deleteLater()
+        
+        if hasattr(self, 'birinci_hafta') and self.birinci_hafta:
+            self.birinci_hafta.deleteLater()
+
+        if hasattr(self, 'ikinci_hafta') and self.ikinci_hafta:
+            self.ikinci_hafta.deleteLater()
+
+        if hasattr(self, 'ucuncu_hafta') and self.ucuncu_hafta:
+            self.ucuncu_hafta.deleteLater()
+
+        if hasattr(self, 'dorduncu_hafta') and self.dorduncu_hafta:
+            self.dorduncu_hafta.deleteLater()
+
+        if hasattr(self, 'back_button_haftalik_soru_ekle_two') and self.back_button_haftalik_soru_ekle_two:
+            self.back_button_haftalik_soru_ekle_two.deleteLater()
+
+        self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
+        result2 = self.cursor.fetchone()
+        self.isim = result2[0]
+
+        self.cursor.execute("SELECT id FROM students WHERE name = ?", (self.isim,)) # nameem sayesinde id yi alıyour
+        result = self.cursor.fetchone()
+        self.current_student_id = result[0]
+        print(self.current_student_id)
+
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+        self.selected_month = ay
+
+        self.student_name_label_haftalik_soru_two = QtWidgets.QLabel(f"{ogrenci_ismi} Kaçıncı Haftaya Ekliceksiniz ?")
+        self.student_name_label_haftalik_soru_two.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_haftalik_soru_two.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_ekle_two_layout.addWidget(self.student_name_label_haftalik_soru_two)
+        self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_two_page)
+
+        self.birinci_hafta = self.create_button("Birinci Hafta", lambda: self.haftalik_dersler("birinci"), "#5DADE2")
+        self.haftalik_soru_ekle_two_layout.addWidget(self.birinci_hafta)
+        
+        self.ikinci_hafta = self.create_button("İkinci Hafta", lambda: self.haftalik_dersler("ikinci"), "#AF7AC5")
+        self.haftalik_soru_ekle_two_layout.addWidget(self.ikinci_hafta)
+        
+        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler("ucuncu"), "#58D68D")
+        self.haftalik_soru_ekle_two_layout.addWidget(self.ucuncu_hafta)
+        
+        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler("dorduncu"), "#F4D03F")
+        self.haftalik_soru_ekle_two_layout.addWidget(self.dorduncu_hafta)
+
+        self.back_button_haftalik_soru_ekle_two = QtWidgets.QPushButton("Geri Dön")
+        self.back_button_haftalik_soru_ekle_two.setStyleSheet(
+            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+            )
+        self.back_button_haftalik_soru_ekle_two.clicked.connect(self.handle_back_button)
+        self.haftalik_soru_ekle_two_layout.addWidget(self.back_button_haftalik_soru_ekle_two)
+
+    def haftalik_dersler(self, hafta):
+        if hasattr(self, 'student_name_label_ders_denemesi_ekle_dersler') and self.student_name_label_ders_denemesi_ekle_dersler:
+            self.student_name_label_ders_denemesi_ekle_dersler.deleteLater()
+    
+        if hasattr(self, 'matematik_button') and self.matematik_button:
+            self.matematik_button.deleteLater()
+
+        if hasattr(self, 'fen_button') and self.fen_button:
+            self.fen_button.deleteLater()
+
+        if hasattr(self, 'turkce_button') and self.turkce_button:
+            self.turkce_button.deleteLater()
+
+        if hasattr(self, 'sosyal_button') and self.sosyal_button:
+            self.sosyal_button.deleteLater()
+
+        if hasattr(self, 'din_button') and self.din_button:
+            self.din_button.deleteLater()
+
+        if hasattr(self, 'ingilizce_button') and self.ingilizce_button:
+            self.ingilizce_button.deleteLater()
+
+        if hasattr(self, 'back_button_ders_denemesi_ekle') and self.back_button_ders_denemesi_ekle:
+            self.back_button_ders_denemesi_ekle.deleteLater()
+            
+        self.selected_week = hafta
+
+        print(self.selected_week)
+        self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
+        result2 = self.cursor.fetchone()
+        self.isim = result2[0]
+
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+
+        self.student_name_label_ders_denemesi_ekle_dersler = QtWidgets.QLabel(f"{ogrenci_ismi} Hangi Derse Ekliceksiniz ?")
+        self.student_name_label_ders_denemesi_ekle_dersler.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_ders_denemesi_ekle_dersler.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.student_name_label_ders_denemesi_ekle_dersler)
+        self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_dersler_page)
+
+        self.matematik_button = QtWidgets.QPushButton("Matematik")
+        self.matematik_button.setStyleSheet(
+            "background-color: #4caf50; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+        self.matematik_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(1, "Matematik"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.matematik_button)
+            ###############################
+
+            # DENEME SONUCU GÖR
+        self.fen_button = QtWidgets.QPushButton("Fen Bilgisi")
+        self.fen_button.setStyleSheet(
+            "background-color: #FF6600; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+        self.fen_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(2, "Fen Bilgisi"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.fen_button)
+
+        self.turkce_button = QtWidgets.QPushButton("Türkçe")
+        self.turkce_button.setStyleSheet(
+            "background-color: #9B59B6; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+        
+        #9B59B6
+        self.turkce_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(3, "Türkçe"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.turkce_button)
+            ###############################
+        
+        self.sosyal_button = QtWidgets.QPushButton("Sosyal Bilgiler")
+        self.sosyal_button.setStyleSheet(
+            "background-color: #DA70D6; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+        
+        #DA70D6
+        self.sosyal_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(4, "Sosyal Bilgiler"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.sosyal_button)
+
+
+        self.din_button = QtWidgets.QPushButton("Din Kültürü")
+        self.din_button.setStyleSheet(
+            "background-color: #F08080; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+            )
+        
+        #DA70D6
+        self.din_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(5, "Din Kültürü"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.din_button)
+        
+        self.ingilizce_button = QtWidgets.QPushButton("İngilizce")
+        self.ingilizce_button.setStyleSheet(
+            "background-color: #C2A1B3; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: black; color: #ffffff"
+        )
+        self.ingilizce_button.clicked.connect(lambda: self.haftalik_soru_ekle_func(6, "İngilizce"))
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.ingilizce_button)
+
+        self.back_button_ders_denemesi_ekle = QtWidgets.QPushButton("Geri Dön")
+        self.back_button_ders_denemesi_ekle.setStyleSheet(
+            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+            )
+        self.back_button_ders_denemesi_ekle.clicked.connect(self.handle_back_button)
+        self.haftalik_soru_ekle_dersler_layout.addWidget(self.back_button_ders_denemesi_ekle)
+
+    def haftalik_soru_ekle_func(self, ders_id, ders_adi):
+    # Yeni bir dialog penceresi oluşturuluyor
+        
+        ay = self.selected_month
+        hafta = self.selected_week
+        
+        edited_ay = ""
+        edited_hafta = ""
+
+        if ay == "ocak":
+            edited_ay = "Ocak"
+
+        elif ay == "subat":
+            edited_ay = "Şubat"
+
+        elif ay == "mart":
+            edited_ay = "Mart"
+
+        elif ay == "nisan":
+            edited_ay = "Nisan"
+
+        elif ay == "mayis":
+            edited_ay = "Mayıs"
+
+        elif ay == "haziran":
+            edited_ay = "Haziran"
+
+        elif ay == "temmuz":
+            edited_ay = "Temmuz"
+
+        elif ay == "agustos":
+            edited_ay = "Ağustos"
+
+        elif ay == "eylul":
+            edited_ay = "Eylül"
+
+        elif ay == "ekim":
+            edited_ay = "Ekim"
+
+        elif ay == "kasim":
+            edited_ay = "Kasım"
+
+        elif ay == "aralik":
+            edited_ay = "Aralık"
+
+        else:
+            edited_ay = ay
+
+        if hafta == "birinci":
+            edited_hafta = "birinci"
+
+        elif hafta == "ikinci":
+            edited_hafta = "ikinci"
+
+        elif hafta == "ucuncu":
+            edited_hafta = "üçüncü"
+
+        elif hafta == "dorduncu":
+            edited_hafta = "dördüncü"
+
+        else:
+            edited_hafta = hafta
+
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle(f"{ders_adi} - Yeni Deneme Sonucu Ekle")
+
+        form_layout = QtWidgets.QFormLayout(dialog)
+
+        # Ders adı QLabel olarak eklendi
+        ders_adi_label = QtWidgets.QLabel(ders_adi, dialog)
+        ay_label = QtWidgets.QLabel(edited_ay, dialog)
+
+        if edited_hafta == "ikinci":
+            hafta_label = QtWidgets.QLabel("İkinci", dialog)
+
+        else:
+            hafta_label = QtWidgets.QLabel(edited_hafta.capitalize(), dialog)
+
+
+        # Doğru, Yanlış ve Boş sayıları için giriş kutuları
+        dogru_sayisi = QtWidgets.QLineEdit(dialog)
+        yanlis_sayisi = QtWidgets.QLineEdit(dialog)
+        bos_sayisi = QtWidgets.QLineEdit(dialog)
+
+        # Formu dolduruyoruz
+        form_layout.addRow("Ay:", ay_label)
+        form_layout.addRow("Hafta:", hafta_label)
+        form_layout.addRow("Ders Adı:", ders_adi_label)
+        form_layout.addRow("Doğru Sayısı:", dogru_sayisi)
+        form_layout.addRow("Yanlış Sayısı:", yanlis_sayisi)
+        form_layout.addRow("Boş Sayısı:", bos_sayisi)
+
+        # OK ve Cancel butonları ekliyoruz
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel, dialog)
+        form_layout.addWidget(button_box)
+
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+
+        # Dialog penceresini göster
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+    # Kullanıcıdan alınan verileri alıyoruz
+            values = [
+                ders_adi_label.text(),
+                dogru_sayisi.text(),
+                yanlis_sayisi.text(),
+                bos_sayisi.text()
+            ]
+
+            # Eğer tüm alanlar doluysa veriyi işliyoruz
+            if all(values):  # Boş alan bırakılmaması için kontrol
+                ders_adi, dogru, yanlis, bos = values  # Verileri ayırıyoruz
+
+                # Sayısal veri kontrolü (sadece rakam girildiğinden emin olalım)
+                if not (dogru.isdigit() and yanlis.isdigit() and bos.isdigit()):
+                    QtWidgets.QMessageBox.warning(self, "Hata", "Doğru, Yanlış ve Boş sayıları sadece rakam olmalıdır!")
+                    return  # Hata durumunda ekleme işlemini durdur
+
+                # String verileri integer'a çevir
+                dogru = int(dogru)
+                yanlis = int(yanlis)
+                bos = int(bos)
+
+                ogrenci_id = self.current_student_id
+
+                # Veritabanına ekleme
+                self.cursor.execute("""
+                    INSERT INTO haftalik_soru (ogrenci_id, ders_id, ders_ismi, ay, hafta, dogru_sayisi, yanlis_sayisi, bos_sayisi) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (ogrenci_id, ders_id, ders_adi, ay, hafta, dogru, yanlis, bos))  
+                self.conn.commit()
+
+                ogrenci_ismi = self.get_name_with_suffix(self.isim)
+                print("##", edited_ay)
+                QtWidgets.QMessageBox.information(self, "Başarılı", f"{ogrenci_ismi} isimli öğrencinin {ders_adi} dersinin {edited_ay} ayının {edited_hafta} haftasına ait soru sayısı başarıyla eklendi!")
+
+            else:
+                QtWidgets.QMessageBox.warning(self, "Hata", "Lütfen tüm alanları doldurun.") 
+
+    def haftalik_incele(self):
+        if hasattr(self, 'student_name_label_haftalik_soru') and self.student_name_label_haftalik_soru:
+            self.student_name_label_haftalik_soru.deleteLater()
+        
+        if hasattr(self, 'ocak_buton') and self.ocak_buton:
+            self.ocak_buton.deleteLater()
+
+        if hasattr(self, 'subat_buton') and self.subat_buton:
+            self.subat_buton.deleteLater()
+
+        if hasattr(self, 'mart_buton') and self.mart_buton:
+            self.mart_buton.deleteLater()
+
+        if hasattr(self, 'nisan_buton') and self.nisan_buton:
+            self.nisan_buton.deleteLater()
+
+        if hasattr(self, 'mayis_buton') and self.mayis_buton:
+            self.mayis_buton.deleteLater()
+
+        if hasattr(self, 'haziran_buton') and self.haziran_buton:
+            self.haziran_buton.deleteLater()
+
+        if hasattr(self, 'temmuz_buton') and self.temmuz_buton:
+            self.temmuz_buton.deleteLater()
+
+        if hasattr(self, 'agustos_buton') and self.agustos_buton:
+            self.agustos_buton.deleteLater()
+
+        if hasattr(self, 'eylul_buton') and self.eylul_buton:
+            self.eylul_buton.deleteLater()
+
+        if hasattr(self, 'ekim_buton') and self.ekim_buton:
+            self.ekim_buton.deleteLater()
+
+        if hasattr(self, 'kasim_buton') and self.kasim_buton:
+            self.kasim_buton.deleteLater()
+
+        if hasattr(self, 'aralik_buton') and self.aralik_buton:
+            self.aralik_buton.deleteLater()
+
+        if hasattr(self, 'back_button_haftalik_soru_ekle') and self.back_button_haftalik_soru_ekle:
+            self.back_button_haftalik_soru_ekle.deleteLater()
+
+        self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
+        result2 = self.cursor.fetchone()
+        self.isim = result2[0]
+
+        self.cursor.execute("SELECT id FROM students WHERE name = ?", (self.isim,)) # nameem sayesinde id yi alıyour
+        result = self.cursor.fetchone()
+        self.current_student_id = result[0]
+        print(self.current_student_id)
+
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+
+        self.student_name_label_haftalik_soru = QtWidgets.QLabel(f"{ogrenci_ismi} Haftalık Soru Sayısını İncele")
+        self.student_name_label_haftalik_soru.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_haftalik_soru.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_incele_one_layout.addWidget(self.student_name_label_haftalik_soru)
+        self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_one_page)
+
+        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_incele_two("ocak"), "#5DADE2")
+        self.haftalik_soru_incele_one_layout.addWidget(self.ocak_buton)
+        
+        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_incele_two("subat"), "#AF7AC5")
+        self.haftalik_soru_incele_one_layout.addWidget(self.subat_buton)
+        
+        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_incele_two("mart"), "#58D68D")
+        self.haftalik_soru_incele_one_layout.addWidget(self.mart_buton)
+        
+        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_incele_two("nisan"), "#F4D03F")
+        self.haftalik_soru_incele_one_layout.addWidget(self.nisan_buton)
+        
+        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_incele_two("mayis"), "#45B39D")
+        self.haftalik_soru_incele_one_layout.addWidget(self.mayis_buton)
+
+        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_incele_two("haziran"), "#F1948A")
+        self.haftalik_soru_incele_one_layout.addWidget(self.haziran_buton)
+
+        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_incele_two("temmuz"), "#EC7063")
+        self.haftalik_soru_incele_one_layout.addWidget(self.temmuz_buton)
+
+        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_incele_two("agustos"), "#F39C12")
+        self.haftalik_soru_incele_one_layout.addWidget(self.agustos_buton)
+
+        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_incele_two("eylul"), "#DC7633")
+        self.haftalik_soru_incele_one_layout.addWidget(self.eylul_buton)
+
+        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_incele_two("ekim"), "#D35400")
+        self.haftalik_soru_incele_one_layout.addWidget(self.ekim_buton)
+
+        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_incele_two("kasim"), "#873600")
+        self.haftalik_soru_incele_one_layout.addWidget(self.kasim_buton)
+
+        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_incele_two("aralik"), "#7FB3D5")
+        self.haftalik_soru_incele_one_layout.addWidget(self.aralik_buton)
+
+        self.back_button_haftalik_soru_ekle = QtWidgets.QPushButton("Geri Dön")
+        self.back_button_haftalik_soru_ekle.setStyleSheet(
+            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+            )
+        self.back_button_haftalik_soru_ekle.clicked.connect(self.handle_back_button)
+        self.haftalik_soru_incele_one_layout.addWidget(self.back_button_haftalik_soru_ekle)
+
+    def haftalik_incele_two(self, ay):
+        if hasattr(self, 'student_name_label_haftalik_soru_two') and self.student_name_label_haftalik_soru_two:
+            self.student_name_label_haftalik_soru_two.deleteLater()
+        
+        if hasattr(self, 'birinci_hafta') and self.birinci_hafta:
+            self.birinci_hafta.deleteLater()
+
+        if hasattr(self, 'ikinci_hafta') and self.ikinci_hafta:
+            self.ikinci_hafta.deleteLater()
+
+        if hasattr(self, 'ucuncu_hafta') and self.ucuncu_hafta:
+            self.ucuncu_hafta.deleteLater()
+
+        if hasattr(self, 'dorduncu_hafta') and self.dorduncu_hafta:
+            self.dorduncu_hafta.deleteLater()
+
+        if hasattr(self, 'back_button_haftalik_soru_ekle_two') and self.back_button_haftalik_soru_ekle_two:
+            self.back_button_haftalik_soru_ekle_two.deleteLater()
+
+        self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
+        result2 = self.cursor.fetchone()
+        self.isim = result2[0]
+
+        self.cursor.execute("SELECT id FROM students WHERE name = ?", (self.isim,)) # nameem sayesinde id yi alıyour
+        result = self.cursor.fetchone()
+        self.current_student_id = result[0]
+        print(self.current_student_id)
+
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+        self.selected_month = ay
+
+        self.student_name_label_haftalik_soru_two = QtWidgets.QLabel(f"{ogrenci_ismi} Kaçıncı Haftaya Ekliceksiniz ?")
+        self.student_name_label_haftalik_soru_two.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_haftalik_soru_two.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_incele_two_layout.addWidget(self.student_name_label_haftalik_soru_two)
+        self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_two_page)
+
+        self.birinci_hafta = self.create_button("Birinci Hafta", lambda: self.haftalik_dersler("birinci"), "#5DADE2")
+        self.haftalik_soru_incele_two_layout.addWidget(self.birinci_hafta)
+        
+        self.ikinci_hafta = self.create_button("İkinci Hafta", lambda: self.haftalik_dersler("ikinci"), "#AF7AC5")
+        self.haftalik_soru_incele_two_layout.addWidget(self.ikinci_hafta)
+        
+        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler("ucuncu"), "#58D68D")
+        self.haftalik_soru_incele_two_layout.addWidget(self.ucuncu_hafta)
+        
+        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler("dorduncu"), "#F4D03F")
+        self.haftalik_soru_incele_two_layout.addWidget(self.dorduncu_hafta)
+
+        self.back_button_haftalik_soru_ekle_two = QtWidgets.QPushButton("Geri Dön")
+        self.back_button_haftalik_soru_ekle_two.setStyleSheet(
+            "background-color: #ff4747; border-radius: 10px; padding: 10px;"
+            "font-size: 16px; color: white;"
+            )
+        self.back_button_haftalik_soru_ekle_two.clicked.connect(self.handle_back_button)
+        self.haftalik_soru_incele_two_layout.addWidget(self.back_button_haftalik_soru_ekle_two)
+
+    def create_button(self, text, callback, color):
+            btn = QtWidgets.QPushButton(text)
+            btn.setStyleSheet(
+                f"background-color: {color}; border-radius: 10px; padding: 10px; font-size: 16px; color: white;"
+            )
+            btn.clicked.connect(callback)
+            return btn
+
+#derse tıkladığında soru sayısını gör yapılcak
 
 if __name__ == "__main__":
     import sys
