@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.student_buttons = []
         self.setWindowTitle("Anasayfa")
-        #self.showFullScreen()
+        self.showFullScreen()
         self.setStyleSheet("background-color: #2c2f33; color: white;")
         self.create_database()
 
@@ -2144,7 +2144,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def haftalik_incele_sonuc(self, ders_id, ders_adi):
     # Önceki widget'ları temizle
 
-        for widget_attr in ['student_name_label_incele', 'dogru_label', 'yanlis_label', 'bos_label', 'back_button_haftalik_soru_ekle']:
+        for widget_attr in ['student_name_label_incele', 'dogru_label', 'yanlis_label', 'bos_label', 'line', 'back_button_haftalik_soru_ekle']:
             if hasattr(self, widget_attr):
                 getattr(self, widget_attr).deleteLater()
 
@@ -2193,10 +2193,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.haftalik_soru_sonuc_layout.addWidget(self.student_name_label_incele)
 
         # Ayraç çizgi
-        line = QtWidgets.QFrame()
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.haftalik_soru_sonuc_layout.addWidget(line)
+        self.line = QtWidgets.QFrame()
+        self.line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.haftalik_soru_sonuc_layout.addWidget(self.line)
 
         # Doğru sayısı etiketi
         self.dogru_label = QtWidgets.QLabel(f"✅ Doğru sayısı: {dogru_toplam}")
