@@ -15,7 +15,6 @@ import os
 import sys
 
 class MainWindow(QtWidgets.QMainWindow):
-
     def __init__(self):
         super().__init__()
         self.student_buttons = []
@@ -261,7 +260,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_one_page)
 
         elif current_page == self.haftalik_soru_incele_dersler_page:
-            self.haftalik_incele_two(self.selected_month) # bunda olduğu ay ı unutmaması için istisna olarak fonksiyonu kullandık
+            # self.haftalik_incele_two(self.selected_month) # bunda olduğu ay ı unutmaması için istisna olarak fonksiyonu kullandık
+            self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_two_page)
+
 
         elif current_page == self.haftalik_soru_sonuc_page:
             self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_dersler_page)
@@ -513,10 +514,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.cursor.execute("SELECT id, name, last_name, student_class FROM students")
         students = self.cursor.fetchall()
 
-        self.row, self.col = 0, 0  # Yeni düzen başlat
-        for student_id, name, last_name, student_class in students:
-            self.create_student_button(name, last_name, student_class)
+        # Eğer öğrenci yoksa uyarı mesajı göster
+        if not students:
+            label = QtWidgets.QLabel("Kayıtlı hiç öğrenciniz yok.")
+            label.setStyleSheet("font-size: 24px; font-weight: bold; color: #fff;")
+            label.setAlignment(QtCore.Qt.AlignCenter)
+            self.student_grid_layout.addWidget(label, 0, 0)
+        else:
+            # Öğrenciler varsa butonları oluştur
+            self.row, self.col = 0, 0
+            for student_id, name, last_name, student_class in students:
+                self.create_student_button(name, last_name, student_class)
 
+        # Geri Dön butonunu her durumda ekle
         self.back_button = QtWidgets.QPushButton("Geri Dön")
         self.back_button.setFixedWidth(150)
         self.back_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -1068,7 +1078,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ogrenci_ismi = self.get_name_with_suffix(self.isim)
 
-        self.student_name_label_ders_denemesi_ekle = QtWidgets.QLabel(f"{ogrenci_ismi} Hangi Ders Denemesini Ekliceksiniz ?")
+        self.student_name_label_ders_denemesi_ekle = QtWidgets.QLabel(f"{ogrenci_ismi} hangi ders denemesini ekleyeceksiniz ?")
         self.student_name_label_ders_denemesi_ekle.setAlignment(QtCore.Qt.AlignCenter)
         self.student_name_label_ders_denemesi_ekle.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
         self.ders_denemesi_ekle_layout.addWidget(self.student_name_label_ders_denemesi_ekle)
@@ -1528,40 +1538,40 @@ class MainWindow(QtWidgets.QMainWindow):
         self.haftalik_soru_ekle_one_layout.addWidget(self.student_name_label_haftalik_soru)
         self.stacked_widget.setCurrentWidget(self.haftalik_soru_ekle_one_page)
 
-        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_two("ocak"), "#5DADE2")
+        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_two("Ocak"), "#5DADE2")
         self.haftalik_soru_ekle_one_layout.addWidget(self.ocak_buton)
         
-        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_two("subat"), "#AF7AC5")
+        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_two("Şubat"), "#AF7AC5")
         self.haftalik_soru_ekle_one_layout.addWidget(self.subat_buton)
         
-        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_two("mart"), "#58D68D")
+        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_two("Mart"), "#58D68D")
         self.haftalik_soru_ekle_one_layout.addWidget(self.mart_buton)
         
-        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_two("nisan"), "#F4D03F")
+        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_two("Nisan"), "#F4D03F")
         self.haftalik_soru_ekle_one_layout.addWidget(self.nisan_buton)
         
-        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_two("mayis"), "#45B39D")
+        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_two("Mayıs"), "#45B39D")
         self.haftalik_soru_ekle_one_layout.addWidget(self.mayis_buton)
 
-        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_two("haziran"), "#F1948A")
+        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_two("Haziran"), "#F1948A")
         self.haftalik_soru_ekle_one_layout.addWidget(self.haziran_buton)
 
-        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_two("temmuz"), "#EC7063")
+        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_two("Temmuz"), "#EC7063")
         self.haftalik_soru_ekle_one_layout.addWidget(self.temmuz_buton)
 
-        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_two("agustos"), "#F39C12")
+        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_two("Ağustos"), "#F39C12")
         self.haftalik_soru_ekle_one_layout.addWidget(self.agustos_buton)
 
-        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_two("eylul"), "#DC7633")
+        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_two("Eylül"), "#DC7633")
         self.haftalik_soru_ekle_one_layout.addWidget(self.eylul_buton)
 
-        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_two("ekim"), "#D35400")
+        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_two("Ekim"), "#D35400")
         self.haftalik_soru_ekle_one_layout.addWidget(self.ekim_buton)
 
-        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_two("kasim"), "#873600")
+        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_two("Kasım"), "#873600")
         self.haftalik_soru_ekle_one_layout.addWidget(self.kasim_buton)
 
-        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_two("aralik"), "#7FB3D5")
+        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_two("Aralık"), "#7FB3D5")
         self.haftalik_soru_ekle_one_layout.addWidget(self.aralik_buton)
 
         self.back_button_haftalik_soru_ekle = QtWidgets.QPushButton("Geri Dön")
@@ -1603,7 +1613,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ogrenci_ismi = self.get_name_with_suffix(self.isim)
         self.selected_month = ay
 
-        self.student_name_label_haftalik_soru_two = QtWidgets.QLabel(f"{ogrenci_ismi} Kaçıncı Haftaya Ekliceksiniz ?")
+        self.student_name_label_haftalik_soru_two = QtWidgets.QLabel(f"{ogrenci_ismi}, {self.selected_month} ayını kaçıncı haftasına ekleyeceksiniz ?")
         self.student_name_label_haftalik_soru_two.setAlignment(QtCore.Qt.AlignCenter)
         self.student_name_label_haftalik_soru_two.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
         self.haftalik_soru_ekle_two_layout.addWidget(self.student_name_label_haftalik_soru_two)
@@ -1615,10 +1625,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ikinci_hafta = self.create_button("İkinci Hafta", lambda: self.haftalik_dersler("ikinci"), "#AF7AC5")
         self.haftalik_soru_ekle_two_layout.addWidget(self.ikinci_hafta)
         
-        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler("ucuncu"), "#58D68D")
+        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler("üçüncü"), "#58D68D")
         self.haftalik_soru_ekle_two_layout.addWidget(self.ucuncu_hafta)
         
-        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler("dorduncu"), "#F4D03F")
+        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler("dördüncü"), "#F4D03F")
         self.haftalik_soru_ekle_two_layout.addWidget(self.dorduncu_hafta)
 
         self.back_button_haftalik_soru_ekle_two = QtWidgets.QPushButton("Geri Dön")
@@ -1654,16 +1664,16 @@ class MainWindow(QtWidgets.QMainWindow):
         if hasattr(self, 'back_button_ders_denemesi_ekle') and self.back_button_ders_denemesi_ekle:
             self.back_button_ders_denemesi_ekle.deleteLater()
             
-        self.selected_week = hafta
-
-        print(self.selected_week)
         self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
         result2 = self.cursor.fetchone()
         self.isim = result2[0]
 
+        self.selected_week = hafta # Hafta bilgisini ilk burda saklar
+        # burda self.selected_week adında değişkene atmamızın sebebi her yerden erişmek istememiz
+
         ogrenci_ismi = self.get_name_with_suffix(self.isim)
 
-        self.student_name_label_ders_denemesi_ekle_dersler = QtWidgets.QLabel(f"{ogrenci_ismi} Hangi Derse Ekliceksiniz ?")
+        self.student_name_label_ders_denemesi_ekle_dersler = QtWidgets.QLabel(f"{ogrenci_ismi}, {self.selected_month} ayının {hafta} haftasının hangi dersini ekleyeceksiniz ?")
         self.student_name_label_ders_denemesi_ekle_dersler.setAlignment(QtCore.Qt.AlignCenter)
         self.student_name_label_ders_denemesi_ekle_dersler.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
         self.haftalik_soru_ekle_dersler_layout.addWidget(self.student_name_label_ders_denemesi_ekle_dersler)
@@ -1736,68 +1746,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.haftalik_soru_ekle_dersler_layout.addWidget(self.back_button_ders_denemesi_ekle)
 
     def haftalik_soru_ekle_func(self, ders_id, ders_adi):
-    # Yeni bir dialog penceresi oluşturuluyor
-        
         ay = self.selected_month
         hafta = self.selected_week
         
-        edited_ay = ""
-        edited_hafta = ""
-
-        if ay == "ocak":
-            edited_ay = "Ocak"
-
-        elif ay == "subat":
-            edited_ay = "Şubat"
-
-        elif ay == "mart":
-            edited_ay = "Mart"
-
-        elif ay == "nisan":
-            edited_ay = "Nisan"
-
-        elif ay == "mayis":
-            edited_ay = "Mayıs"
-
-        elif ay == "haziran":
-            edited_ay = "Haziran"
-
-        elif ay == "temmuz":
-            edited_ay = "Temmuz"
-
-        elif ay == "agustos":
-            edited_ay = "Ağustos"
-
-        elif ay == "eylul":
-            edited_ay = "Eylül"
-
-        elif ay == "ekim":
-            edited_ay = "Ekim"
-
-        elif ay == "kasim":
-            edited_ay = "Kasım"
-
-        elif ay == "aralik":
-            edited_ay = "Aralık"
-
-        else:
-            edited_ay = ay
-
-        if hafta == "birinci":
-            edited_hafta = "birinci"
-
-        elif hafta == "ikinci":
-            edited_hafta = "ikinci"
-
-        elif hafta == "ucuncu":
-            edited_hafta = "üçüncü"
-
-        elif hafta == "dorduncu":
-            edited_hafta = "dördüncü"
-
-        else:
-            edited_hafta = hafta
-
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle(f"{ders_adi} - Yeni Deneme Sonucu Ekle")
 
@@ -1805,13 +1756,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Ders adı QLabel olarak eklendi
         ders_adi_label = QtWidgets.QLabel(ders_adi, dialog)
-        ay_label = QtWidgets.QLabel(edited_ay, dialog)
-
-        if edited_hafta == "ikinci":
-            hafta_label = QtWidgets.QLabel("İkinci", dialog)
-
-        else:
-            hafta_label = QtWidgets.QLabel(edited_hafta.capitalize(), dialog)
+        ay_label = QtWidgets.QLabel(ay, dialog)
+        hafta_label = QtWidgets.QLabel(hafta, dialog)
 
 
         # Doğru, Yanlış ve Boş sayıları için giriş kutuları
@@ -1868,8 +1814,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.conn.commit()
 
                 ogrenci_ismi = self.get_name_with_suffix(self.isim)
-                print("##", edited_ay)
-                QtWidgets.QMessageBox.information(self, "Başarılı", f"{ogrenci_ismi} isimli öğrencinin {ders_adi} dersinin {edited_ay} ayının {edited_hafta} haftasına ait soru sayısı başarıyla eklendi!")
+                QtWidgets.QMessageBox.information(self, "Başarılı", f"{ogrenci_ismi} isimli öğrencinin {ders_adi} dersinin {ay} ayının {hafta} haftasına ait soru sayısı başarıyla eklendi!")
 
             else:
                 QtWidgets.QMessageBox.warning(self, "Hata", "Lütfen tüm alanları doldurun.") 
@@ -1934,40 +1879,40 @@ class MainWindow(QtWidgets.QMainWindow):
         self.haftalik_soru_incele_one_layout.addWidget(self.student_name_label_haftalik_soru_incele)
         self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_one_page)
 
-        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_incele_two("ocak"), "#5DADE2")
+        self.ocak_buton = self.create_button("Ocak", lambda: self.haftalik_incele_two("Ocak"), "#5DADE2")
         self.haftalik_soru_incele_one_layout.addWidget(self.ocak_buton)
         
-        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_incele_two("subat"), "#AF7AC5")
+        self.subat_buton = self.create_button("Şubat", lambda: self.haftalik_incele_two("Şubat"), "#AF7AC5")
         self.haftalik_soru_incele_one_layout.addWidget(self.subat_buton)
         
-        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_incele_two("mart"), "#58D68D")
+        self.mart_buton = self.create_button("Mart", lambda: self.haftalik_incele_two("Mart"), "#58D68D")
         self.haftalik_soru_incele_one_layout.addWidget(self.mart_buton)
         
-        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_incele_two("nisan"), "#F4D03F")
+        self.nisan_buton = self.create_button("Nisan", lambda: self.haftalik_incele_two("Nisan"), "#F4D03F")
         self.haftalik_soru_incele_one_layout.addWidget(self.nisan_buton)
         
-        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_incele_two("mayis"), "#45B39D")
+        self.mayis_buton = self.create_button("Mayıs", lambda: self.haftalik_incele_two("Mayıs"), "#45B39D")
         self.haftalik_soru_incele_one_layout.addWidget(self.mayis_buton)
 
-        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_incele_two("haziran"), "#F1948A")
+        self.haziran_buton = self.create_button("Haziran", lambda: self.haftalik_incele_two("Haziran"), "#F1948A")
         self.haftalik_soru_incele_one_layout.addWidget(self.haziran_buton)
 
-        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_incele_two("temmuz"), "#EC7063")
+        self.temmuz_buton = self.create_button("Temmuz", lambda: self.haftalik_incele_two("Temmuz"), "#EC7063")
         self.haftalik_soru_incele_one_layout.addWidget(self.temmuz_buton)
 
-        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_incele_two("agustos"), "#F39C12")
+        self.agustos_buton = self.create_button("Ağustos", lambda: self.haftalik_incele_two("Ağustos"), "#F39C12")
         self.haftalik_soru_incele_one_layout.addWidget(self.agustos_buton)
 
-        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_incele_two("eylul"), "#DC7633")
+        self.eylul_buton = self.create_button("Eylül", lambda: self.haftalik_incele_two("Eylül"), "#DC7633")
         self.haftalik_soru_incele_one_layout.addWidget(self.eylul_buton)
 
-        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_incele_two("ekim"), "#D35400")
+        self.ekim_buton = self.create_button("Ekim", lambda: self.haftalik_incele_two("Ekim"), "#D35400")
         self.haftalik_soru_incele_one_layout.addWidget(self.ekim_buton)
 
-        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_incele_two("kasim"), "#873600")
+        self.kasim_buton = self.create_button("Kasım", lambda: self.haftalik_incele_two("Kasım"), "#873600")
         self.haftalik_soru_incele_one_layout.addWidget(self.kasim_buton)
 
-        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_incele_two("aralik"), "#7FB3D5")
+        self.aralik_buton = self.create_button("Aralık", lambda: self.haftalik_incele_two("Aralık"), "#7FB3D5")
         self.haftalik_soru_incele_one_layout.addWidget(self.aralik_buton)
 
         self.back_button_haftalik_soru_incele = QtWidgets.QPushButton("Geri Dön")
@@ -1979,8 +1924,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.haftalik_soru_incele_one_layout.addWidget(self.back_button_haftalik_soru_incele)
 
     def haftalik_incele_two(self, ay):
-        if hasattr(self, 'student_name_label_haftalik_soru_two') and self.student_name_label_haftalik_soru_two:
-            self.student_name_label_haftalik_soru_two.deleteLater()
+        if hasattr(self, 'student_name_label_haftalik_incele_two') and self.student_name_label_haftalik_incele_two:
+            self.student_name_label_haftalik_incele_two.deleteLater()
         
         if hasattr(self, 'birinci_hafta') and self.birinci_hafta:
             self.birinci_hafta.deleteLater()
@@ -2006,13 +1951,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_student_id = result[0]
         print(self.current_student_id)
 
-        ogrenci_ismi = self.get_name_with_suffix(self.isim)
         self.selected_month = ay
 
-        self.student_name_label_haftalik_soru_two = QtWidgets.QLabel(f"{ogrenci_ismi} Kaçıncı Haftayı İnceleyeceksiniz ?")
-        self.student_name_label_haftalik_soru_two.setAlignment(QtCore.Qt.AlignCenter)
-        self.student_name_label_haftalik_soru_two.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
-        self.haftalik_soru_incele_two_layout.addWidget(self.student_name_label_haftalik_soru_two)
+        ogrenci_ismi = self.get_name_with_suffix(self.isim)
+
+        self.student_name_label_haftalik_incele_two = QtWidgets.QLabel(f"{ogrenci_ismi}, {ay} ayının kaçıncı haftasını inceleyeceksiniz ?")
+        self.student_name_label_haftalik_incele_two.setAlignment(QtCore.Qt.AlignCenter)
+        self.student_name_label_haftalik_incele_two.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
+        self.haftalik_soru_incele_two_layout.addWidget(self.student_name_label_haftalik_incele_two)
         self.stacked_widget.setCurrentWidget(self.haftalik_soru_incele_two_page)
 
         self.birinci_hafta = self.create_button("Birinci Hafta", lambda: self.haftalik_dersler_incele("birinci"), "#5DADE2")
@@ -2021,10 +1967,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ikinci_hafta = self.create_button("İkinci Hafta", lambda: self.haftalik_dersler_incele("ikinci"), "#AF7AC5")
         self.haftalik_soru_incele_two_layout.addWidget(self.ikinci_hafta)
         
-        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler_incele("ucuncu"), "#58D68D")
+        self.ucuncu_hafta = self.create_button("Üçüncü Hafta", lambda: self.haftalik_dersler_incele("üçüncü"), "#58D68D")
         self.haftalik_soru_incele_two_layout.addWidget(self.ucuncu_hafta)
         
-        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler_incele("dorduncu"), "#F4D03F")
+        self.dorduncu_hafta = self.create_button("Dördüncü Hafta", lambda: self.haftalik_dersler_incele("dördüncü"), "#F4D03F")
         self.haftalik_soru_incele_two_layout.addWidget(self.dorduncu_hafta)
 
         self.back_button_haftalik_soru_ekle_two = QtWidgets.QPushButton("Geri Dön")
@@ -2060,16 +2006,14 @@ class MainWindow(QtWidgets.QMainWindow):
         if hasattr(self, 'back_button') and self.back_button:
             self.back_button.deleteLater()
             
-        self.selected_week = hafta
-
-        print(self.selected_week)
         self.cursor.execute("SELECT name FROM students WHERE id = ?", (self.current_student_id,))
         result2 = self.cursor.fetchone()
         self.isim = result2[0]
-
         ogrenci_ismi = self.get_name_with_suffix(self.isim)
 
-        self.student_name_label_ders_denemesi_incele_dersler = QtWidgets.QLabel(f"{ogrenci_ismi} Hangi Derse Ekliceksiniz ?")
+        self.selected_week = hafta
+
+        self.student_name_label_ders_denemesi_incele_dersler = QtWidgets.QLabel(f"{ogrenci_ismi}, {self.selected_month} ayının {hafta} haftasının hangi dersini inceleyeceksiniz ?")
         self.student_name_label_ders_denemesi_incele_dersler.setAlignment(QtCore.Qt.AlignCenter)
         self.student_name_label_ders_denemesi_incele_dersler.setStyleSheet("font-size: 24px; font-weight: bold; color: #7289da;")
         self.haftalik_soru_incele_dersler_layout.addWidget(self.student_name_label_ders_denemesi_incele_dersler)
@@ -2082,7 +2026,6 @@ class MainWindow(QtWidgets.QMainWindow):
             )
         self.matematik_button.clicked.connect(lambda: self.haftalik_incele_sonuc(1, "Matematik"))
         self.haftalik_soru_incele_dersler_layout.addWidget(self.matematik_button)
-            ###############################
 
             # DENEME SONUCU GÖR
         self.fen_button = QtWidgets.QPushButton("Fen Bilgisi")
