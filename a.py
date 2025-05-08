@@ -4,14 +4,15 @@
 # def ogrenci_page gereksiz bi kod karmaşası var o düzeltiecek
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from PyQt5.QtWidgets import QMessageBox
 import platform
 import requests
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import sqlite3
-from PyQt5.QtWidgets import QMessageBox
 import os
+import sys
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -2240,9 +2241,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stacked_widget.setCurrentWidget(self.haftalik_soru_sonuc_page)
 
-
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
