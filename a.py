@@ -1,6 +1,7 @@
 # Tek Genel sıralama
 # genel sıralamanın butonları filan yapılcak
 # Haftalık soru sayısı incele yapıldı belki sonradan tasarıma zorlanabilir tek genel sıralalama kaldı
+# def ogrenci_page gereksiz bi kod karmaşası var o düzeltiecek
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 import platform
@@ -10,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import sqlite3
 from PyQt5.QtWidgets import QMessageBox
+import os
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -49,7 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         self.main_layout.addWidget(self.ogrencilerim_button)
 
-        self.ogrencilerim_button.clicked.connect(self.ogrenci_page)
+        self.ogrencilerim_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.ogrencilerim_page))
 
         self.haftalık_deneme_sonucu = QtWidgets.QPushButton("DENEMELER")
         self.haftalık_deneme_sonucu.setStyleSheet(
@@ -364,9 +366,6 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Hata", "Mail gönderilemedi!\nİnternet Bağlantınızı Kontrol Ediniz")
 
-    def ogrenci_page(self):
-        self.stacked_widget.setCurrentWidget(self.ogrencilerim_page)
-
     def add_student(self):
         self.cursor.execute("SELECT COUNT(*) FROM students")
         student_count = self.cursor.fetchone()[0]
@@ -411,6 +410,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.conn.commit()
 
     def create_database(self):
+        if not os.path.exists("db"):
+            os.makedirs("db")
+
         self.conn = sqlite3.connect("db/veritabani.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
