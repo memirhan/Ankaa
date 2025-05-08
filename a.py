@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QMessageBox
 import os
 
 class MainWindow(QtWidgets.QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.student_buttons = []
@@ -196,8 +197,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stacked_widget.addWidget(self.haftalik_soru_incele_two_page)
         self.stacked_widget.addWidget(self.haftalik_soru_incele_dersler_page)
         self.stacked_widget.addWidget(self.haftalik_soru_sonuc_page)
-
-
         
         self.load_students()
 
@@ -213,6 +212,14 @@ class MainWindow(QtWidgets.QMainWindow):
         if yanit == QMessageBox.Yes:
             self.close()
 
+    def create_button(self, text, callback, color):
+            btn = QtWidgets.QPushButton(text)
+            btn.setStyleSheet(
+                f"background-color: {color}; border-radius: 10px; padding: 10px; font-size: 16px; color: white;"
+            )
+            btn.clicked.connect(callback)
+            return btn
+    
     def handle_back_button(self):
         current_page = self.stacked_widget.currentWidget()
         if current_page == self.ogrencilerim_page:
@@ -2233,15 +2240,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stacked_widget.setCurrentWidget(self.haftalik_soru_sonuc_page)
 
-    def create_button(self, text, callback, color):
-            btn = QtWidgets.QPushButton(text)
-            btn.setStyleSheet(
-                f"background-color: {color}; border-radius: 10px; padding: 10px; font-size: 16px; color: white;"
-            )
-            btn.clicked.connect(callback)
-            return btn
-
-#derse tıkladığında soru sayısını gör yapılcak
 
 if __name__ == "__main__":
     import sys
