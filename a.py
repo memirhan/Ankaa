@@ -1,7 +1,7 @@
 # Tek Genel sıralama
 # genel sıralamanın butonları filan yapılcak
 # Haftalık soru sayısı incele yapıldı belki sonradan tasarıma zorlanabilir tek genel sıralalama kaldı
-# def ogrenci_page gereksiz bi kod karmaşası var o düzeltiecek
+# en son denemeler için etiket bilgisi eklendi
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from email.mime.multipart import MIMEMultipart
@@ -54,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ogrencilerim_button.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.ogrencilerim_page))
 
-        self.haftalık_deneme_sonucu = QtWidgets.QPushButton("DENEMELER")
+        self.haftalık_deneme_sonucu = QtWidgets.QPushButton("GENEL SIRALAMA")
         self.haftalık_deneme_sonucu.setStyleSheet(
             "background-color: #3F51B5; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: white;"
@@ -62,7 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_layout.addWidget(self.haftalık_deneme_sonucu)
         # self.ogrencilerim_button.clicked.connect(self.ogrenci_page)
 
-        self.sorun_bildir = QtWidgets.QPushButton("Sorun Bildir")
+        self.sorun_bildir = QtWidgets.QPushButton("SORUN BİLDİR")
         self.sorun_bildir.setStyleSheet(
             "background-color: #FF7F00; border-radius: 10px; padding: 10px;"
             "font-size: 16px; color: white;"
@@ -436,6 +436,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS sinav_sonuclari (
                                 id INTEGER PRIMARY KEY,
                                 ogrenci_id INTEGER,
+                                etiket TEXT,
                                 sinav_ismi TEXT,
                                 sinav_tarihi TEXT,
                                 turkce_d INTEGER,
@@ -545,7 +546,8 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog.setWindowTitle("Yeni Deneme Sonucu Ekle")
 
         form_layout = QtWidgets.QFormLayout(dialog)
-
+        
+        etiket = QtWidgets.QLineEdit(dialog)
         deneme_isim = QtWidgets.QLineEdit(dialog)
         deneme_tarihi = QtWidgets.QLineEdit(dialog)
 
@@ -573,6 +575,7 @@ class MainWindow(QtWidgets.QMainWindow):
         fen_y = QtWidgets.QLineEdit(dialog)
         fen_b = QtWidgets.QLineEdit(dialog)
         
+        form_layout.addRow("Deneme Etiketi", etiket)
         form_layout.addRow("Deneme İsmi:", deneme_isim)
         form_layout.addRow("Deneme Tarihi:", deneme_tarihi)
 
@@ -609,6 +612,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             values = [
+                etiket.text(),
                 deneme_isim.text(),
                 deneme_tarihi.text(),
                 turkce_d.text(), turkce_y.text(), turkce_b.text(),
@@ -620,19 +624,18 @@ class MainWindow(QtWidgets.QMainWindow):
             ]
 
             if all(values):  # Boş alan bırakılmaması için kontrol
-                sinav_ismi, sinav_tarihi, *numeric_values = values  # İlk iki eleman sınav ismi ve tarihi, geri kalanı sayılar
+                etiket, sinav_ismi, sinav_tarihi, *numeric_values = values  # İlk iki eleman sınav ismi ve tarihi, geri kalanı sayılar
 
                 if not all(x.text().isdigit() for x in [turkce_d, turkce_y, turkce_b, sosyal_d, sosyal_y, sosyal_b, din_d, din_y, din_b, ingilizce_d, ingilizce_y, ingilizce_b, matematik_d, matematik_y, matematik_b, fen_d, fen_y, fen_b]):
                     QtWidgets.QMessageBox.warning(self, "Hata", "Doğru, Yanlış ve Boş sayıları sadece rakam olmalıdır!")
                     return  # Hata durumunda ekleme işlemini durdur
 
-
                 ogrenci_id = self.current_student_id
 
                 self.cursor.execute("""
-                    INSERT INTO sinav_sonuclari (ogrenci_id, sinav_ismi, sinav_tarihi, turkce_d, turkce_y, turkce_b, sosyal_d, sosyal_y, sosyal_b, din_d, din_y, din_b, ingilizce_d, ingilizce_y, ingilizce_b, matematik_d, matematik_y, matematik_b, fen_d, fen_y, fen_b) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (ogrenci_id, sinav_ismi, sinav_tarihi, *map(int, numeric_values)))  # Sadece sayısal alanları int'e çevir
+                    INSERT INTO sinav_sonuclari (ogrenci_id, etiket, sinav_ismi, sinav_tarihi, turkce_d, turkce_y, turkce_b, sosyal_d, sosyal_y, sosyal_b, din_d, din_y, din_b, ingilizce_d, ingilizce_y, ingilizce_b, matematik_d, matematik_y, matematik_b, fen_d, fen_y, fen_b) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (ogrenci_id, etiket, sinav_ismi, sinav_tarihi, *map(int, numeric_values)))  # Sadece sayısal alanları int'e çevir
                 self.conn.commit()
 
                 ogrenci_ismi = self.get_name_with_suffix(self.isim)
